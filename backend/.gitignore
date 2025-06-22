@@ -1,0 +1,29 @@
+# Python-specific
+**/venv/
+*.pyc
+__pycache__/
+.pytest_cache/
+
+# Node.js-specific
+**/node_modules/
+
+# OS and Editor-specific
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Deployment packages
+*.zip
+
+# Serverless Framework files
+.serverless/
+.webpack/
+
+# Serverless Framework files
+.serverless/
+.webpack/
+
+.env
+
+layers/

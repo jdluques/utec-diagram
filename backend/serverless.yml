@@ -1,0 +1,114 @@
+org: jdluques
+service: utec-diagrams
+
+provider:
+  name: aws
+  runtime: python3.12
+  region: ${env:AWS_REGION}
+  environment: ${env}
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "dynamodb:PutItem"
+            - "dynamodb:GetItem"
+            - "dynamodb:UpdateItem"
+            - "dynamodb:Query"
+            - "dynamodb:Scan"
+          Resource:
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${env:FILES_TABLE}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${env:FILE_COUNTERS_TABLE}"
+  package:
+    individually: true
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-python-requirements
+
+functions:
+  erDiagramGenerator:
+    handler: diagrams.er-diagram.handler.lambda_handler
+    runtime: python3.12
+    package:
+      include:
+        - diagram/er-diagram/**
+        - utils/**
+        - db/**
+    layers:
+      - {Ref: CommonUtilsLayer}
+    events:
+      - http:
+          path: er-diagram
+          method: post
+
+  awsDiagramGenerator:
+    handler: diagrams.aws-diagram.handler.lambda_handler
+    runtime: python3.12
+    package:
+      include:
+        - diagram/aws-diagram/**
+        - utils/**
+        - db/**
+    layers:
+      - {Ref: CommonUtilsLayer}
+    events:
+      - http:
+          path: aws-diagram
+          method: post
+
+  jsonDiagramGenerator:
+    handler: diagrams.json-diagram.handler
+    runtime: nodejs22.x
+    package:
+      include:
+        - diagram/json-diagram/**
+    events:
+      - http:
+          path: json-diagram
+          method: post
+
+layers:
+  commonUtilsLayer:
+    path: backend/layers/common
+    compatibleRuntimes:
+      - python3.12
+
+resources:
+  Resources:
+    FilesTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${env:DYNAMODB_TABLE_FILES}
+        AttributeDefinitions:
+          - AttributeName: "tenantId"
+            AttributeType: "S"
+          - AttributeName: "fileId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "tenantId"
+            KeyType: "HASH"
+          - AttributeName: "fileId"
+            KeyType: "RANGE"
+        BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: "DiagramTypeIndex"
+            KeySchema:
+              - AttributeName: "diagramType"
+                KeyType: "HASH"
+              - AttributeName: "tenantId"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
+
+    FileCountersTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: ${env:DYNAMODB_TABLE_FILE_COUNTERS}
+        AttributeDefinitions:
+          - AttributeName: "tenantId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "tenantId"
+            KeyType: "HASH"
+        BillingMode: PAY_PER_REQUEST
