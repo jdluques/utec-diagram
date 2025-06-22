@@ -1,4 +1,4 @@
-def validate_body(input_format, output_format, inputText, tenant_id):
+def validate_body(input_format, output_format, input_text, tenant_id):
     if not tenant_id:
         return "Missing tenantId"
 
@@ -8,7 +8,7 @@ def validate_body(input_format, output_format, inputText, tenant_id):
     if not output_format:
         return "Missing output format"
     
-    if not inputText:
+    if not input_text:
         return f"inputText is required"
     
     return None

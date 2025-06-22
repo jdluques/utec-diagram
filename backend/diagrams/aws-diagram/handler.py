@@ -11,13 +11,13 @@ def lambda_handler(event):
         tenant_id = body.get('tenantId')
         input_format = body.get('inputFormat')
         output_format = body.get('outputFormat')
-        inputText = body.get('schemaText', '')
+        input_text = body.get('schemaText', '')
 
-        error = validate_body(input_format, output_format, inputText, tenant_id)
+        error = validate_body(input_format, output_format, input_text, tenant_id)
         if error:
             return {"statusCode": 400, "body": error}
 
-        aws_file = generate_aws_file(inputText, output_format)
+        aws_file = generate_aws_file(input_text, output_format)
 
         bucket_name, s3_key = handle_file_upload(aws_file, tenant_id, body.get('fileId'), body.get('metadata', {}), output_format)
 
