@@ -1,0 +1,38 @@
+name: Update Lambda Layer
+
+on:
+  push:
+    paths:
+      - 'backend/db/**'
+      - 'backend/utils/**'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Step 3: Build Lambda Layer
+      - name: Build Lambda Layer
+        run: |
+          rm -rf backend/layers/common/python/
+          mkdir -p backend/layers/common/python/
+          cp -r backend/utils/ backend/layers/common/python/
+          cp -r backend/db/ backend/layers/common/python/
+          cd backend/layers/common
+          zip -r common-layer.zip python
+          cd ../../..
+
+      # Step 4: Deploy Layer
+      #- name: Deploy with Serverless
+      #  run: serverless deploy
+
