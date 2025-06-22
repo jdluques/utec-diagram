@@ -12,7 +12,7 @@ s3 = boto3.client('s3')
 files_table = dynamodb.Table('Files')
 bucket_name = "your-bucket-name"
 
-def handle_file_upload(image_buffer, tenant_id, file_id, metadata, image_format):
+def handle_file_upload(image_buffer, tenant_id, file_id, metadata, output_format):
     try:
         file_id = file_id or get_next_file_id(tenant_id)
 
@@ -23,7 +23,7 @@ def handle_file_upload(image_buffer, tenant_id, file_id, metadata, image_format)
             Bucket=bucket_name,
             Key=s3_key,
             Body=image_buffer,
-            ContentType=image_format
+            ContentType=output_format
         )
 
         metadata = get_file_metadata(tenant_id, file_id, metadata)
