@@ -12,6 +12,7 @@ import { diagramAPI } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowLeft, Search, Filter, Eye, Download, Trash2, Plus, FileImage } from "lucide-react"
 import Link from "next/link"
+import { ImageZoomModal } from "@/components/image-zoom-modal"
 
 interface Diagram {
   id: string
@@ -34,6 +35,8 @@ export function DiagramGallery() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [selectedDiagram, setSelectedDiagram] = useState<Diagram | null>(null)
   const [viewModalOpen, setViewModalOpen] = useState(false)
+  const [zoomModalOpen, setZoomModalOpen] = useState(false)
+  const [zoomImage, setZoomImage] = useState<{ url: string; name: string } | null>(null)
 
   useEffect(() => {
     loadDiagrams()
@@ -106,6 +109,11 @@ export function DiagramGallery() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+  }
+
+  const handleZoomImage = (imageUrl: string, imageName: string) => {
+    setZoomImage({ url: imageUrl, name: imageName })
+    setZoomModalOpen(true)
   }
 
   const getTypeColor = (type: string) => {
@@ -251,8 +259,8 @@ export function DiagramGallery() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div
-                    className="aspect-video bg-slate-100 rounded-lg overflow-hidden cursor-pointer"
-                    onClick={() => handleViewDiagram(diagram)}
+                    className="aspect-video bg-slate-100 rounded-lg overflow-hidden cursor-zoom-in"
+                    onClick={() => handleZoomImage(diagram.imageUrl, diagram.name)}
                   >
                     <img
                       src={diagram.imageUrl || "/placeholder.svg"}
@@ -307,7 +315,8 @@ export function DiagramGallery() {
                 <img
                   src={selectedDiagram.imageUrl || "/placeholder.svg"}
                   alt={selectedDiagram.name}
-                  className="w-full h-auto max-h-96 object-contain mx-auto"
+                  className="w-full h-auto max-h-96 object-contain mx-auto cursor-zoom-in"
+                  onClick={() => handleZoomImage(selectedDiagram.imageUrl, selectedDiagram.name)}
                 />
               </div>
 
@@ -336,6 +345,14 @@ export function DiagramGallery() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Zoom Modal */}
+      <ImageZoomModal
+        open={zoomModalOpen}
+        onOpenChange={setZoomModalOpen}
+        imageUrl={zoomImage?.url || ""}
+        imageName={zoomImage?.name || ""}
+      />
     </div>
   )
 }
