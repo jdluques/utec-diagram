@@ -72,8 +72,11 @@ functions:
         -lambdas/get-image-url/**
     events:
       -http:
-        path: image-url
+        path: file/{fileId}/image-url
         method: get
+        requests:
+          paths:
+            fileId: true
   
   getFileHistory:
     handler: lambdas.get-file-history.hanlder.lambda_handler

@@ -11,7 +11,7 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
 
         tenant_id = body.get('tenantId')
-        file_id = body.get('fileId')
+        file_id = event.get('pathParameters', {}).get('fileId', None)
 
         if not tenant_id or not file_id:
             return {
