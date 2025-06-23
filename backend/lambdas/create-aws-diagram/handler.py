@@ -13,7 +13,7 @@ def lambda_handler(event, context):
         tenant_id = body.get('tenantId')
         input_format = body.get('inputFormat')
         output_format = body.get('outputFormat')
-        input_text = body.get('schemaText', '')
+        input_text = body.get('schemaText')
         file_name = body.get('fileName')
 
         error = validate_body(input_format, output_format, input_text, tenant_id)
