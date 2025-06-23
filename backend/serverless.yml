@@ -90,6 +90,19 @@ functions:
         requests:
           pahts:
             fileId: true
+    
+  restoreFileVersion:
+    handler: lambdas.restore-file-version.handler.lambda_handler
+    package:
+      include:
+        -lambdas/restore-file-version/**
+    events:
+      -http:
+        path: file/{fileId}/history/restore
+        method: patch
+        requests:
+          pahts:
+            fileId: true
 
 layers:
   commonUtilsLayer:
