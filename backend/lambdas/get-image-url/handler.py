@@ -4,8 +4,6 @@ import os
 
 s3 = boto3.client('s3')
 
-BUCKET_NAME = os.getenv('S3-BUCKET-NAME=')
-
 def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
@@ -19,12 +17,13 @@ def lambda_handler(event, context):
                 "body": json.dumps({"message": "Both tenantId and fileId are required"})
             }
 
+        bucket_name = os.getenv("S3-BUCKET-NAME")
         s3_key = f"{tenant_id}/{file_id}"
 
         url = s3.generate_presigned_url(
             ClientMethod="get_object",
             Params={
-                "Bucket": BUCKET_NAME,
+                "Bucket": bucket_name,
                 "Key": s3_key
             },
             ExpiresIn=3600

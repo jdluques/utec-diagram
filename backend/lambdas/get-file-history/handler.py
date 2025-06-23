@@ -4,8 +4,6 @@ import os
 
 s3 = boto3.client('s3')
 
-BUCKET_NAME = os.getenv('S3-BUCKET-NAME=')
-
 def get_file_versions(event, context):
     try:
         body = json.loads(event['body'])
@@ -21,10 +19,11 @@ def get_file_versions(event, context):
                 "body": json.dumps({"message": "Both tenantId and fileId are required"})
             }
 
+        bucket_name = os.getenv("S3-BUCKET-NAME")
         s3_key = f"{tenant_id}/{file_id}"
 
         response = s3.list_object_versions(
-            Bucket=BUCKET_NAME,
+            Bucket=bucket_name,
             Prefix=s3_key,
             KeyMarker=key_marker,
             VersionIdMarker=version_id_marker
