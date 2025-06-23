@@ -5,26 +5,33 @@ provider:
   name: aws
   runtime: python3.12
   region: ${env:AWS_REGION}
-  environment: ${env}
+  environment:
+    AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+    AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
+    AWS_REGION: ${env:AWS_REGION, 'us-east-1'}
+    S3_BUCKET_NAME: ${env:S3_BUCKET_NAME}
+    DYNAMODB_TABLE_FILES: ${env:DYNAMODB_TABLE_FILES}
+    DYNAMODB_TABLE_FILE_COUNTERS: ${env:DYNAMODB_TABLE_FILE_COUNTERS}
   iam:
     role:
       statements:
         - Effect: "Allow"
           Action:
-            - "dynamodb:PutItem"
-            - "dynamodb:GetItem"
-            - "dynamodb:UpdateItem"
-            - "dynamodb:Query"
-            - "dynamodb:Scan"
+            - dynamodb:*
           Resource:
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${env:FILES_TABLE}"
-            - "arn:aws:dynamodb:${self:provider.region}:*:table/${env:FILE_COUNTERS_TABLE}"
-  package:
-    individually: true
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${env:DYNAMODB_TABLE_FILES}"
+            - "arn:aws:dynamodb:${self:provider.region}:*:table/${env:DYNAMODB_TABLE_FILE_COUNTERS}"
+
+package:
+  individually: true
 
 plugins:
   - serverless-dotenv-plugin
   - serverless-python-requirements
+
+custom:
+  dotenv:
+    path: .env
 
 functions:
   erDiagramGenerator:
@@ -40,7 +47,6 @@ functions:
       - http:
           path: diagrams/er
           method: post
-
   awsDiagramGenerator:
     handler: lambdas.create-aws-diagram.handler.lambda_handler
     package:
@@ -54,7 +60,6 @@ functions:
       - http:
           path: diagrams/aws
           method: post
-
   jsonDiagramGenerator:
     handler: lambdas.create-json-diagram.handler.lambda_handler
     package:
@@ -64,45 +69,45 @@ functions:
       - http:
           path: /diagrams/json
           method: post
-
   getImageUrl:
     handler: lambdas.get-image-url.handler.lambda_handler
     package:
       include:
         -lambdas/get-image-url/**
     events:
-      -http:
-        path: files/{fileId}/image-url
-        method: get
-        requests:
-          paths:
-            fileId: true
-  
+      - http:
+          path: files/{fileId}/image-url
+          method: get
+          request:
+            parameters:
+              paths:
+                fileId: true
   getFileHistory:
     handler: lambdas.get-file-history.handler.lambda_handler
     package:
       include:
         -lambdas/get-file-history/**
     events:
-      -http:
-        path: files/{fileId}/history
-        method: get
-        requests:
-          pahts:
-            fileId: true
-    
+      - http:
+          path: files/{fileId}/history
+          method: get
+          request:
+            parameters:
+              paths:
+                fileId: true
   restoreFileVersion:
     handler: lambdas.restore-file-version.handler.lambda_handler
     package:
       include:
         -lambdas/restore-file-version/**
     events:
-      -http:
-        path: files/{fileId}/history/restore
-        method: patch
-        requests:
-          pahts:
-            fileId: true
+      - http:
+          path: files/{fileId}/history/restore
+          method: patch
+          request:
+            parameters:
+              paths:
+                fileId: true
 
 layers:
   commonUtilsLayer:
