@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ImageZoomModal } from "@/components/image-zoom-modal"
 
 interface Diagram {
   id: string
@@ -31,6 +32,8 @@ export function Dashboard() {
   const { user, logout } = useAuth()
   const [diagrams, setDiagrams] = useState<Diagram[]>([])
   const [loading, setLoading] = useState(true)
+  const [zoomModalOpen, setZoomModalOpen] = useState(false)
+  const [zoomImage, setZoomImage] = useState<{ url: string; name: string } | null>(null)
 
   useEffect(() => {
     loadDiagrams()
@@ -71,6 +74,11 @@ export function Dashboard() {
       default:
         return type.toUpperCase()
     }
+  }
+
+  const handleZoomImage = (imageUrl: string, imageName: string) => {
+    setZoomImage({ url: imageUrl, name: imageName })
+    setZoomModalOpen(true)
   }
 
   return (
@@ -226,11 +234,14 @@ export function Dashboard() {
                     <CardDescription>Created {new Date(diagram.createdAt).toLocaleDateString()}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="aspect-video bg-slate-100 rounded-lg overflow-hidden">
+                    <div
+                      className="aspect-video bg-slate-100 rounded-lg overflow-hidden cursor-zoom-in"
+                      onClick={() => handleZoomImage(diagram.imageUrl, diagram.name)}
+                    >
                       <img
                         src={diagram.imageUrl || "/placeholder.svg"}
                         alt={diagram.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover hover:scale-105 transition-transform"
                       />
                     </div>
                   </CardContent>
@@ -239,6 +250,13 @@ export function Dashboard() {
             </div>
           )}
         </div>
+        {/* Zoom Modal */}
+        <ImageZoomModal
+          open={zoomModalOpen}
+          onOpenChange={setZoomModalOpen}
+          imageUrl={zoomImage?.url || ""}
+          imageName={zoomImage?.name || ""}
+        />
       </main>
     </div>
   )
