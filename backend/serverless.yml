@@ -38,7 +38,7 @@ functions:
       - {Ref: CommonUtilsLayer}
     events:
       - http:
-          path: er-diagram
+          path: diagrams/er
           method: post
 
   awsDiagramGenerator:
@@ -52,7 +52,7 @@ functions:
       - {Ref: CommonUtilsLayer}
     events:
       - http:
-          path: aws-diagram
+          path: diagrams/aws
           method: post
 
   jsonDiagramGenerator:
@@ -62,7 +62,7 @@ functions:
         - lambdas/json-diagram/**
     events:
       - http:
-          path: json-diagram
+          path: /diagrams/json
           method: post
 
   getImageUrl:
@@ -72,7 +72,7 @@ functions:
         -lambdas/get-image-url/**
     events:
       -http:
-        path: file/{fileId}/image-url
+        path: files/{fileId}/image-url
         method: get
         requests:
           paths:
@@ -85,7 +85,7 @@ functions:
         -lambdas/get-file-history/**
     events:
       -http:
-        path: file/{fileId}/history
+        path: files/{fileId}/history
         method: get
         requests:
           pahts:
@@ -98,7 +98,7 @@ functions:
         -lambdas/restore-file-version/**
     events:
       -http:
-        path: file/{fileId}/history/restore
+        path: files/{fileId}/history/restore
         method: patch
         requests:
           pahts:
