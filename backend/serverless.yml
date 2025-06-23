@@ -66,7 +66,7 @@ functions:
           method: post
 
   getImageUrl:
-    handler: lambdas.get-image-url.hanlder.lambda_handler
+    handler: lambdas.get-image-url.handler.lambda_handler
     package:
       include:
         -lambdas/get-image-url/**
@@ -79,7 +79,7 @@ functions:
             fileId: true
   
   getFileHistory:
-    handler: lambdas.get-file-history.hanlder.lambda_handler
+    handler: lambdas.get-file-history.handler.lambda_handler
     package:
       include:
         -lambdas/get-file-history/**

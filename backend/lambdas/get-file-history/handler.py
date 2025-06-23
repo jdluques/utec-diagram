@@ -4,7 +4,7 @@ import os
 
 s3 = boto3.client('s3')
 
-def get_file_versions(event, context):
+def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
 
