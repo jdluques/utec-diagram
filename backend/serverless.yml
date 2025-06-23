@@ -74,6 +74,19 @@ functions:
       -http:
         path: image-url
         method: get
+  
+  getFileHistory:
+    handler: lambdas.get-file-history.hanlder.lambda_handler
+    package:
+      include:
+        -lambdas/get-file-history/**
+    events:
+      -http:
+        path: file/{fileId}/history
+        method: get
+        requests:
+          pahts:
+            fileId: true
 
 layers:
   commonUtilsLayer:
