@@ -7,7 +7,7 @@ from utils.render_image import render_er_to_memory
 from ...utils.file_upload import handle_file_upload
 from ...db.files_queries import insert_file_data
 
-def lambda_handler(event):
+def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
 
