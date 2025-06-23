@@ -28,11 +28,10 @@ plugins:
 
 functions:
   erDiagramGenerator:
-    handler: diagrams.er-diagram.handler.lambda_handler
-    runtime: python3.12
+    handler: lambdas.create-er-diagram.handler.lambda_handler
     package:
       include:
-        - diagram/er-diagram/**
+        - lambdas/er-diagram/**
         - utils/**
         - db/**
     layers:
@@ -43,11 +42,10 @@ functions:
           method: post
 
   awsDiagramGenerator:
-    handler: diagrams.aws-diagram.handler.lambda_handler
-    runtime: python3.12
+    handler: lambdas.create-aws-diagram.handler.lambda_handler
     package:
       include:
-        - diagram/aws-diagram/**
+        - lambdas/aws-diagram/**
         - utils/**
         - db/**
     layers:
@@ -58,15 +56,24 @@ functions:
           method: post
 
   jsonDiagramGenerator:
-    handler: diagrams.json-diagram.handler
-    runtime: nodejs22.x
+    handler: lambdas.create-json-diagram.handler.lambda_handler
     package:
       include:
-        - diagram/json-diagram/**
+        - lambdas/json-diagram/**
     events:
       - http:
           path: json-diagram
           method: post
+
+  getImageUrl:
+    handler: lambdas.get-image-url.hanlder.lambda_handler
+    package:
+      include:
+        -lambdas/get-image-url/**
+    events:
+      -http:
+        path: image-url
+        method: get
 
 layers:
   commonUtilsLayer:
