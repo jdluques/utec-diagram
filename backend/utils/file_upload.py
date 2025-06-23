@@ -3,7 +3,6 @@ import json
 import os
 
 from utils.file_metadata import get_file_metadata
-from ..db.files_queries import insert_file_metadata
 from ..db.file_counters_queries import get_next_file_id
 
 dynamodb = boto3.resource('dynamodb')
@@ -27,9 +26,8 @@ def handle_file_upload(image_buffer, tenant_id, file_id, metadata, output_format
         )
 
         metadata = get_file_metadata(tenant_id, file_id, metadata)
-        insert_file_metadata(tenant_id, file_id, metadata)
         
-        return bucket_name, s3_key
+        return bucket_name, s3_key, file_id, metadata
     
     except Exception as e:
         return {

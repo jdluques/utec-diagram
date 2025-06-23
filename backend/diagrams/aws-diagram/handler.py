@@ -2,7 +2,9 @@ import json
 
 from utils.validate_body import validate_body
 from utils.generate_aws import generate_aws_file
+
 from ...utils.file_upload import handle_file_upload
+from ...db.files_queries import insert_file_data
 
 def lambda_handler(event):
     try:
@@ -12,6 +14,7 @@ def lambda_handler(event):
         input_format = body.get('inputFormat')
         output_format = body.get('outputFormat')
         input_text = body.get('schemaText', '')
+        file_name = body.get('fileName')
 
         error = validate_body(input_format, output_format, input_text, tenant_id)
         if error:
@@ -19,7 +22,8 @@ def lambda_handler(event):
 
         aws_file = generate_aws_file(input_text, output_format)
 
-        bucket_name, s3_key = handle_file_upload(aws_file, tenant_id, body.get('fileId'), body.get('metadata', {}), output_format)
+        bucket_name, s3_key, file_id, metadata = handle_file_upload(aws_file, tenant_id, body.get('fileId'), body.get('metadata', {}), output_format)
+        insert_file_data(tenant_id, file_id, s3_key, file_name, 'json', metadata)
 
         return {
             "statusCode": 200,
